@@ -1,10 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Website</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Socials</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #121212;
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+        }
+        .social-btn {
+            display: block;
+            margin: 10px auto;
+            padding: 15px;
+            width: 200px;
+            background: #5865F2; /* Discord blue */
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: 0.3s ease-in-out;
+        }
+        .social-btn:hover {
+            background: #4752C4;
+        }
+        .discord-btn::before {
+            content: "Discord"; /* Default text */
+        }
+        .discord-btn:hover::before {
+            content: "kaz._.idk"; /* Show username on hover */
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My Website!</h1>
-    <p>Hosted for free on GitHub Pages.</p>
+
+    <div class="container">
+        <h1>Connect with Me!</h1>
+        <a href="https://discord.com/users/437346641880678400" target="_blank" class="social-btn discord-btn"></a>
+    </div>
+
 </body>
 </html>
