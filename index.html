@@ -64,6 +64,21 @@
             display: block;
             margin: auto;
         }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .controls button {
+            font-size: 20px;
+            padding: 10px;
+            background: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -98,10 +113,18 @@
         <p>Press the button to change the background color!</p>
         <button onclick="changeColor()">Change Color</button>
     </div>
-    
+
     <div id="game3" class="section">
         <h2>Snake Game</h2>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div class="controls">
+            <button onclick="changeDirection('UP')">⬆</button>
+        </div>
+        <div class="controls">
+            <button onclick="changeDirection('LEFT')">⬅</button>
+            <button onclick="changeDirection('DOWN')">⬇</button>
+            <button onclick="changeDirection('RIGHT')">➡</button>
+        </div>
     </div>
 
     <script>
@@ -112,33 +135,10 @@
             document.getElementById(sectionId).classList.add('active');
         }
         
-        let score = 0;
-        let upgradeCost = 10;
-        let autoClickers = 0;
-        
-        function increaseScore() {
-            score++;
-            document.getElementById("score").innerText = score;
-        }
-        
-        function buyUpgrade() {
-            if (score >= upgradeCost) {
-                score -= upgradeCost;
-                autoClickers++;
-                upgradeCost = Math.ceil(upgradeCost * 1.5);
-                document.getElementById("upgradeCost").innerText = upgradeCost;
-                setInterval(increaseScore, 1000);
-            }
-        }
-        
-        function changeColor() {
-            document.body.style.backgroundColor = '#' + Math.floor(Math.random()*16777215).toString(16);
-        }
-        
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         let snake = [{x: 200, y: 200}];
-        let direction = "RIGHT";
+        let direction = null;
         let food = { x: Math.floor(Math.random() * 20) * 20, y: Math.floor(Math.random() * 20) * 20 };
         let gameRunning = true;
 
@@ -149,8 +149,17 @@
             if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
         });
 
+        function changeDirection(newDirection) {
+            if ((newDirection === "UP" && direction !== "DOWN") ||
+                (newDirection === "DOWN" && direction !== "UP") ||
+                (newDirection === "LEFT" && direction !== "RIGHT") ||
+                (newDirection === "RIGHT" && direction !== "LEFT")) {
+                direction = newDirection;
+            }
+        }
+
         function updateSnake() {
-            if (!gameRunning) return;
+            if (!gameRunning || !direction) return;
             let head = { ...snake[0] };
             if (direction === "UP") head.y -= 20;
             if (direction === "DOWN") head.y += 20;
