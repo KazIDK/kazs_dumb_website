@@ -11,7 +11,7 @@
             background-color: #121212;
             color: white;
             text-align: center;
-            transition: 0.5s;
+            transition: background 0.5s ease;
         }
         nav {
             display: flex;
@@ -22,6 +22,7 @@
             width: 100%;
             top: 0;
             left: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         nav a {
             margin: 0 20px;
@@ -46,6 +47,7 @@
             height: 150px;
             border-radius: 50%;
             margin-top: 80px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
         .discord {
             font-size: 20px;
@@ -55,29 +57,23 @@
             border: none;
             cursor: pointer;
             transition: 0.3s;
+            border-radius: 5px;
         }
         .discord:hover::after {
             content: " kaz._.idk";
         }
-        canvas {
-            background: black;
-            display: block;
-            margin: auto;
-        }
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .controls button {
-            font-size: 20px;
+        .btn {
             padding: 10px;
             background: #333;
             color: white;
             border: none;
             cursor: pointer;
             border-radius: 5px;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: cyan;
+            color: black;
         }
     </style>
 </head>
@@ -85,9 +81,9 @@
     <nav>
         <a href="#" onclick="showSection('home')">Home</a>
         <a href="#" onclick="showSection('socials')">My Socials</a>
+        <a href="#" onclick="showSection('background')">Background</a>
         <a href="#" onclick="showSection('game1')">Clicker Game</a>
-        <a href="#" onclick="showSection('game2')">Color Game</a>
-        <a href="#" onclick="showSection('game3')">Snake Game</a>
+        <a href="#" onclick="showSection('game2')">Snake Game</a>
     </nav>
 
     <div id="home" class="section active">
@@ -100,6 +96,14 @@
         <button class="discord" onclick="window.location.href='https://discord.com/users/437346641880678400'">Discord</button>
     </div>
 
+    <div id="background" class="section">
+        <h2>Choose Background</h2>
+        <button class="btn" onclick="setBackground('#121212')">Default</button>
+        <button class="btn" onclick="setBackground('#3498db')">Blue</button>
+        <button class="btn" onclick="setBackground('#2ecc71')">Green</button>
+        <button class="btn" onclick="setBackground('#e74c3c')">Red</button>
+    </div>
+
     <div id="game1" class="section">
         <h2>Cookie Clicker Game</h2>
         <p>Cookies: <span id="score">0</span></p>
@@ -109,22 +113,10 @@
     </div>
 
     <div id="game2" class="section">
-        <h2>Color Change Game</h2>
-        <p>Press the button to change the background color!</p>
-        <button onclick="changeColor()">Change Color</button>
-    </div>
-
-    <div id="game3" class="section">
         <h2>Snake Game</h2>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <div class="controls">
-            <button onclick="changeDirection('UP')">⬆</button>
-        </div>
-        <div class="controls">
-            <button onclick="changeDirection('LEFT')">⬅</button>
-            <button onclick="changeDirection('DOWN')">⬇</button>
-            <button onclick="changeDirection('RIGHT')">➡</button>
-        </div>
+        <br>
+        <button class="btn" onclick="restartGame()">Restart</button>
     </div>
 
     <script>
@@ -133,6 +125,15 @@
                 section.classList.remove('active');
             });
             document.getElementById(sectionId).classList.add('active');
+        }
+        
+        function setBackground(color) {
+            document.body.style.background = color;
+            localStorage.setItem("background", color);
+        }
+        
+        if (localStorage.getItem("background")) {
+            document.body.style.background = localStorage.getItem("background");
         }
         
         const canvas = document.getElementById("gameCanvas");
@@ -148,15 +149,6 @@
             if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
             if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
         });
-
-        function changeDirection(newDirection) {
-            if ((newDirection === "UP" && direction !== "DOWN") ||
-                (newDirection === "DOWN" && direction !== "UP") ||
-                (newDirection === "LEFT" && direction !== "RIGHT") ||
-                (newDirection === "RIGHT" && direction !== "LEFT")) {
-                direction = newDirection;
-            }
-        }
 
         function updateSnake() {
             if (!gameRunning || !direction) return;
@@ -175,11 +167,16 @@
             
             if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
                 gameRunning = false;
-                alert("Game Over! Refresh to play again.");
                 return;
             }
             
             snake.unshift(head);
+        }
+
+        function restartGame() {
+            snake = [{x: 200, y: 200}];
+            direction = null;
+            gameRunning = true;
         }
 
         function drawGame() {
@@ -189,12 +186,8 @@
             ctx.fillStyle = "lime";
             snake.forEach(part => ctx.fillRect(part.x, part.y, 20, 20));
         }
-        
-        function gameLoop() {
-            updateSnake();
-            drawGame();
-        }
-        setInterval(gameLoop, 100);
+
+        setInterval(() => { updateSnake(); drawGame(); }, 100);
     </script>
 </body>
 </html>
