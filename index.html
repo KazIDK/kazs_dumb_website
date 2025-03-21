@@ -36,39 +36,10 @@
         .section {
             display: none;
             padding: 100px 20px;
-            height: 100vh;
+            min-height: 100vh;
         }
         .active {
             display: block;
-        }
-        img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            margin-top: 80px;
-        }
-        .discord {
-            font-size: 20px;
-            padding: 10px;
-            background: #5865F2;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .discord:hover::after {
-            content: " kaz._.idk";
-        }
-        canvas {
-            background: black;
-            display: block;
-            margin: auto;
-        }
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
         }
         .controls button {
             font-size: 20px;
@@ -79,38 +50,44 @@
             cursor: pointer;
             border-radius: 5px;
         }
+        canvas {
+            background: black;
+            display: block;
+            margin: auto;
+        }
+        @media (max-width: 600px) {
+            nav {
+                flex-wrap: wrap;
+            }
+            nav a {
+                font-size: 16px;
+                margin: 5px;
+            }
+            canvas {
+                width: 90%;
+                height: auto;
+            }
+        }
     </style>
 </head>
 <body>
     <nav>
         <a href="#" onclick="showSection('home')">Home</a>
-        <a href="#" onclick="showSection('socials')">My Socials</a>
         <a href="#" onclick="showSection('game1')">Clicker Game</a>
         <a href="#" onclick="showSection('game2')">Background Changer</a>
         <a href="#" onclick="showSection('game3')">Snake Game</a>
     </nav>
 
-    <div id="home" class="section active">
-        <h1>Welcome to Kaz's Dumb Website</h1>
-        <img src="pfp.png" alt="Profile Picture">
-    </div>
-
-    <div id="socials" class="section">
-        <h2>My Socials</h2>
-        <button class="discord" onclick="window.location.href='https://discord.com/users/437346641880678400'">Discord</button>
-    </div>
-
     <div id="game1" class="section">
-        <h2>Cookie Clicker Game</h2>
+        <h2>Clicker Game</h2>
         <p>Cookies: <span id="score">0</span></p>
         <button onclick="increaseScore()">Click Me!</button>
-        <h3>Upgrades</h3>
-        <button onclick="buyUpgrade()">Buy Auto Clicker (Cost: <span id="upgradeCost">10</span>)</button>
+        <h3>Leaderboard</h3>
+        <ul id="leaderboard"></ul>
     </div>
 
     <div id="game2" class="section">
         <h2>Background Changer</h2>
-        <p>Select a background color:</p>
         <input type="color" id="bgColorPicker" onchange="changeColor()">
     </div>
 
@@ -119,6 +96,12 @@
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         <div class="controls">
             <button onclick="restartGame()">Restart</button>
+        </div>
+        <div class="controls">
+            <button onclick="changeDirection('UP')">⬆</button>
+            <button onclick="changeDirection('LEFT')">⬅</button>
+            <button onclick="changeDirection('DOWN')">⬇</button>
+            <button onclick="changeDirection('RIGHT')">➡</button>
         </div>
     </div>
 
@@ -129,7 +112,6 @@
             });
             document.getElementById(sectionId).classList.add('active');
         }
-        
         function changeColor() {
             let color = document.getElementById("bgColorPicker").value;
             document.body.style.backgroundColor = color;
@@ -137,62 +119,55 @@
         }
         window.onload = function() {
             let savedColor = localStorage.getItem("bgColor");
-            if (savedColor) {
-                document.body.style.backgroundColor = savedColor;
-            }
+            if (savedColor) document.body.style.backgroundColor = savedColor;
         };
-
         let score = 0;
-        let upgradeCost = 10;
-        let autoClickers = 0;
-
         function increaseScore() {
             score++;
             document.getElementById("score").innerText = score;
+            let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
+            scores.push(score);
+            scores = scores.sort((a, b) => b - a).slice(0, 5);
+            localStorage.setItem("leaderboard", JSON.stringify(scores));
+            updateLeaderboard();
         }
-        
-        function buyUpgrade() {
-            if (score >= upgradeCost) {
-                score -= upgradeCost;
-                autoClickers++;
-                upgradeCost *= 2;
-                document.getElementById("upgradeCost").innerText = upgradeCost;
-                setInterval(increaseScore, 1000);
-            }
+        function updateLeaderboard() {
+            let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
+            let leaderboard = document.getElementById("leaderboard");
+            leaderboard.innerHTML = scores.map(score => `<li>${score}</li>`).join('');
         }
-        
+        updateLeaderboard();
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         let snake = [{x: 200, y: 200}];
-        let direction = "RIGHT";
+        let direction = null;
         let food = { x: Math.floor(Math.random() * 20) * 20, y: Math.floor(Math.random() * 20) * 20 };
         let gameRunning = true;
-
         document.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
-            if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
-            if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
-            if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+            if (event.key.startsWith("Arrow")) changeDirection(event.key.replace("Arrow", "").toUpperCase());
         });
-
+        function changeDirection(newDirection) {
+            const opposite = { UP: "DOWN", DOWN: "UP", LEFT: "RIGHT", RIGHT: "LEFT" };
+            if (direction !== opposite[newDirection]) direction = newDirection;
+        }
         function updateSnake() {
-            if (!gameRunning) return;
+            if (!gameRunning || !direction) return;
             let head = { ...snake[0] };
             if (direction === "UP") head.y -= 20;
             if (direction === "DOWN") head.y += 20;
             if (direction === "LEFT") head.x -= 20;
             if (direction === "RIGHT") head.x += 20;
-            
             if (head.x === food.x && head.y === food.y) {
-                food.x = Math.floor(Math.random() * 20) * 20;
-                food.y = Math.floor(Math.random() * 20) * 20;
+                food = { x: Math.floor(Math.random() * 20) * 20, y: Math.floor(Math.random() * 20) * 20 };
             } else {
                 snake.pop();
             }
-            
+            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                gameRunning = false;
+                alert("Game Over!");
+            }
             snake.unshift(head);
         }
-        
         function drawGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "red";
@@ -200,8 +175,12 @@
             ctx.fillStyle = "lime";
             snake.forEach(part => ctx.fillRect(part.x, part.y, 20, 20));
         }
-        
         setInterval(() => { updateSnake(); drawGame(); }, 100);
+        function restartGame() {
+            snake = [{x: 200, y: 200}];
+            direction = null;
+            gameRunning = true;
+        }
     </script>
 </body>
 </html>
