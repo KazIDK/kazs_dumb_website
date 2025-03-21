@@ -3,49 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Socials</title>
+    <title>My Socials & Game</title>
     <style>
         body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
             font-family: Arial, sans-serif;
-            text-align: center;
             background-color: #121212;
             color: white;
-            padding: 20px;
+            text-align: center;
         }
-        .container {
-            max-width: 400px;
-            margin: auto;
+        .left, .right {
+            width: 40%;
         }
-        .social-btn {
+        .center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        .socials a {
             display: block;
-            margin: 10px auto;
-            padding: 15px;
-            width: 200px;
-            background: #5865F2; /* Discord blue */
-            color: white;
+            margin: 10px 0;
             text-decoration: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            transition: 0.3s ease-in-out;
+            color: white;
+            font-size: 20px;
+            transition: 0.3s;
         }
-        .social-btn:hover {
-            background: #4752C4;
+        .socials a:hover {
+            color: cyan;
         }
-        .discord-btn::before {
-            content: "Discord"; /* Default text */
+        .discord:hover::after {
+            content: " kaz._.idk";
+            color: cyan;
         }
-        .discord-btn:hover::before {
-            content: "kaz._.idk"; /* Show username on hover */
+        .game button {
+            padding: 10px 20px;
+            font-size: 20px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>My discord bc idk</h1>
-        <a href="https://discord.com/users/437346641880678400" target="_blank" class="social-btn discord-btn"></a>
+    <div class="left game">
+        <h2>Clicker Game</h2>
+        <p>Score: <span id="score">0</span></p>
+        <button onclick="increaseScore()">Click Me!</button>
     </div>
-
+    
+    <div class="center">
+        <img src="pfp.png" alt="Profile Picture">
+    </div>
+    
+    <div class="right socials">
+        <h2>My Socials</h2>
+        <a href="#" class="discord">Discord</a>
+        <a href="https://twitter.com/" target="_blank">Twitter</a>
+        <a href="https://github.com/" target="_blank">GitHub</a>
+    </div>
+    
+    <script>
+        let score = 0;
+        function increaseScore() {
+            score++;
+            document.getElementById("score").innerText = score;
+        }
+    </script>
 </body>
 </html>
