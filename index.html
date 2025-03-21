@@ -59,10 +59,10 @@
         .discord:hover::after {
             content: " kaz._.idk";
         }
-        .game button {
-            padding: 10px 20px;
-            font-size: 20px;
-            cursor: pointer;
+        canvas {
+            background: black;
+            display: block;
+            margin: auto;
         }
     </style>
 </head>
@@ -70,8 +70,8 @@
     <nav>
         <a href="#" onclick="showSection('home')">Home</a>
         <a href="#" onclick="showSection('socials')">My Socials</a>
-        <a href="#" onclick="showSection('dumb clicker')">dumb clicker</a>
-        <a href="#" onclick="showSection('background changer')">background changer</a>
+        <a href="#" onclick="showSection('game1')">Clicker Game</a>
+        <a href="#" onclick="showSection('game2')">Color Game</a>
         <a href="#" onclick="showSection('game3')">Snake Game</a>
     </nav>
 
@@ -85,23 +85,23 @@
         <button class="discord" onclick="window.location.href='https://discord.com/users/437346641880678400'">Discord</button>
     </div>
 
-    <div id="dumb clicker" class="section">
+    <div id="game1" class="section">
         <h2>Cookie Clicker Game</h2>
         <p>Cookies: <span id="score">0</span></p>
-        <button onclick="increaseScore()">Click Me!</button>
+        <button onclick="increaseScore()">🍪 Click Me!</button>
         <h3>Upgrades</h3>
         <button onclick="buyUpgrade()">Buy Auto Clicker (Cost: <span id="upgradeCost">10</span>)</button>
     </div>
 
-    <div id="background changer" class="section">
-        <h2>js change the background</h2>
+    <div id="game2" class="section">
+        <h2>Color Change Game</h2>
         <p>Press the button to change the background color!</p>
         <button onclick="changeColor()">Change Color</button>
     </div>
-
+    
     <div id="game3" class="section">
         <h2>Snake Game</h2>
-        <canvas id="gameCanvas" width="400" height="400" style="background: black;"></canvas>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
     </div>
 
     <script>
@@ -140,7 +140,8 @@
         let snake = [{x: 200, y: 200}];
         let direction = "RIGHT";
         let food = { x: Math.floor(Math.random() * 20) * 20, y: Math.floor(Math.random() * 20) * 20 };
-        
+        let gameRunning = true;
+
         document.addEventListener("keydown", (event) => {
             if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
             if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
@@ -149,6 +150,7 @@
         });
 
         function updateSnake() {
+            if (!gameRunning) return;
             let head = { ...snake[0] };
             if (direction === "UP") head.y -= 20;
             if (direction === "DOWN") head.y += 20;
@@ -160,6 +162,12 @@
                 food.y = Math.floor(Math.random() * 20) * 20;
             } else {
                 snake.pop();
+            }
+            
+            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                gameRunning = false;
+                alert("Game Over! Refresh to play again.");
+                return;
             }
             
             snake.unshift(head);
