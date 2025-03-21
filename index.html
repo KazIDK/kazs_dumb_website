@@ -3,47 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Socials & Game</title>
+    <title>Kaz's Dumb Website</title>
     <style>
         body {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #121212;
             color: white;
             text-align: center;
+            transition: 0.5s;
         }
-        .left, .right {
-            width: 40%;
-        }
-        .center {
+        nav {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: center;
+            background: #1f1f1f;
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+        }
+        nav a {
+            margin: 0 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+            transition: 0.3s;
+        }
+        nav a:hover {
+            color: cyan;
+        }
+        .section {
+            display: none;
+            padding: 100px 20px;
+            height: 100vh;
+        }
+        .active {
+            display: block;
         }
         img {
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            margin-bottom: 20px;
+            margin-top: 80px;
         }
-        .socials a {
-            display: block;
-            margin: 10px 0;
-            text-decoration: none;
-            color: white;
+        .discord {
             font-size: 20px;
+            padding: 10px;
+            background: #5865F2;
+            color: white;
+            border: none;
+            cursor: pointer;
             transition: 0.3s;
-        }
-        .socials a:hover {
-            color: cyan;
         }
         .discord:hover::after {
             content: " kaz._.idk";
-            color: cyan;
         }
         .game button {
             padding: 10px 20px;
@@ -53,28 +67,51 @@
     </style>
 </head>
 <body>
-    <div class="left game">
+    <nav>
+        <a href="#" onclick="showSection('home')">Home</a>
+        <a href="#" onclick="showSection('socials')">My Socials</a>
+        <a href="#" onclick="showSection('game1')">Game 1</a>
+        <a href="#" onclick="showSection('game2')">Game 2</a>
+    </nav>
+
+    <div id="home" class="section active">
+        <h1>Welcome to Kaz's Dumb Website</h1>
+        <img src="pfp.png" alt="Profile Picture">
+    </div>
+
+    <div id="socials" class="section">
+        <h2>My Socials</h2>
+        <button class="discord" onclick="window.location.href='https://discord.com/users/437346641880678400'">Discord</button>
+    </div>
+
+    <div id="game1" class="section">
         <h2>Clicker Game</h2>
         <p>Score: <span id="score">0</span></p>
         <button onclick="increaseScore()">Click Me!</button>
     </div>
-    
-    <div class="center">
-        <img src="pfp.png" alt="Profile Picture">
+
+    <div id="game2" class="section">
+        <h2>Simple Game 2</h2>
+        <p>Press the button to change the background color!</p>
+        <button onclick="changeColor()">Change Color</button>
     </div>
-    
-    <div class="right socials">
-        <h2>My Socials</h2>
-        <a href="#" class="discord">Discord</a>
-        <a href="https://twitter.com/" target="_blank">Twitter</a>
-        <a href="https://github.com/" target="_blank">GitHub</a>
-    </div>
-    
+
     <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+        
         let score = 0;
         function increaseScore() {
             score++;
             document.getElementById("score").innerText = score;
+        }
+        
+        function changeColor() {
+            document.body.style.backgroundColor = '#' + Math.floor(Math.random()*16777215).toString(16);
         }
     </script>
 </body>
