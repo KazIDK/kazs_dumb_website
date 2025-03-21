@@ -100,6 +100,14 @@
         <button class="discord" onclick="window.location.href='https://discord.com/users/437346641880678400'">Discord</button>
     </div>
 
+    <div id="game1" class="section">
+        <h2>Cookie Clicker Game</h2>
+        <p>Cookies: <span id="score">0</span></p>
+        <button onclick="increaseScore()">🍪 Click Me!</button>
+        <h3>Upgrades</h3>
+        <button onclick="buyUpgrade()">Buy Auto Clicker (Cost: <span id="upgradeCost">10</span>)</button>
+    </div>
+
     <div id="game2" class="section">
         <h2>Background Changer</h2>
         <p>Select a background color:</p>
@@ -133,11 +141,30 @@
                 document.body.style.backgroundColor = savedColor;
             }
         };
+
+        let score = 0;
+        let upgradeCost = 10;
+        let autoClickers = 0;
+
+        function increaseScore() {
+            score++;
+            document.getElementById("score").innerText = score;
+        }
+        
+        function buyUpgrade() {
+            if (score >= upgradeCost) {
+                score -= upgradeCost;
+                autoClickers++;
+                upgradeCost *= 2;
+                document.getElementById("upgradeCost").innerText = upgradeCost;
+                setInterval(increaseScore, 1000);
+            }
+        }
         
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         let snake = [{x: 200, y: 200}];
-        let direction = null;
+        let direction = "RIGHT";
         let food = { x: Math.floor(Math.random() * 20) * 20, y: Math.floor(Math.random() * 20) * 20 };
         let gameRunning = true;
 
@@ -149,7 +176,7 @@
         });
 
         function updateSnake() {
-            if (!gameRunning || !direction) return;
+            if (!gameRunning) return;
             let head = { ...snake[0] };
             if (direction === "UP") head.y -= 20;
             if (direction === "DOWN") head.y += 20;
@@ -163,15 +190,9 @@
                 snake.pop();
             }
             
-            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-                gameRunning = false;
-                alert("Game Over!");
-                return;
-            }
-            
             snake.unshift(head);
         }
-
+        
         function drawGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "red";
@@ -180,17 +201,7 @@
             snake.forEach(part => ctx.fillRect(part.x, part.y, 20, 20));
         }
         
-        function gameLoop() {
-            updateSnake();
-            drawGame();
-        }
-        setInterval(gameLoop, 100);
-        
-        function restartGame() {
-            snake = [{x: 200, y: 200}];
-            direction = null;
-            gameRunning = true;
-        }
+        setInterval(() => { updateSnake(); drawGame(); }, 100);
     </script>
 </body>
 </html>
