@@ -72,7 +72,7 @@
         <a href="#" onclick="showSection('socials')">My Socials</a>
         <a href="#" onclick="showSection('dumb clicker')">dumb clicker</a>
         <a href="#" onclick="showSection('background changer')">background changer</a>
-        <a href="#" onclick="showSection('avoid the enemy')">avoid the enemy</a>
+        <a href="#" onclick="showSection('game3')">Snake Game</a>
     </nav>
 
     <div id="home" class="section active">
@@ -93,15 +93,15 @@
         <button onclick="buyUpgrade()">Buy Auto Clicker (Cost: <span id="upgradeCost">10</span>)</button>
     </div>
 
-    <div id="avoid the enemy" class="section">
-        <h2>New Game: Avoid the Enemy</h2>
-        <canvas id="gameCanvas" width="400" height="400" style="background: black;"></canvas>
-    </div>
-
     <div id="background changer" class="section">
         <h2>js change the background</h2>
         <p>Press the button to change the background color!</p>
         <button onclick="changeColor()">Change Color</button>
+    </div>
+
+    <div id="game3" class="section">
+        <h2>Snake Game</h2>
+        <canvas id="gameCanvas" width="400" height="400" style="background: black;"></canvas>
     </div>
 
     <script>
@@ -137,32 +137,47 @@
         
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
-        let player = { x: 200, y: 350, size: 20 };
-        let enemy = { x: Math.random() * 380, y: 0, size: 20, speed: 2 };
+        let snake = [{x: 200, y: 200}];
+        let direction = "RIGHT";
+        let food = { x: Math.floor(Math.random() * 20) * 20, y: Math.floor(Math.random() * 20) * 20 };
+        
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+            if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+            if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+            if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+        });
+
+        function updateSnake() {
+            let head = { ...snake[0] };
+            if (direction === "UP") head.y -= 20;
+            if (direction === "DOWN") head.y += 20;
+            if (direction === "LEFT") head.x -= 20;
+            if (direction === "RIGHT") head.x += 20;
+            
+            if (head.x === food.x && head.y === food.y) {
+                food.x = Math.floor(Math.random() * 20) * 20;
+                food.y = Math.floor(Math.random() * 20) * 20;
+            } else {
+                snake.pop();
+            }
+            
+            snake.unshift(head);
+        }
 
         function drawGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "white";
-            ctx.fillRect(player.x, player.y, player.size, player.size);
             ctx.fillStyle = "red";
-            ctx.fillRect(enemy.x, enemy.y, enemy.size, enemy.size);
+            ctx.fillRect(food.x, food.y, 20, 20);
+            ctx.fillStyle = "lime";
+            snake.forEach(part => ctx.fillRect(part.x, part.y, 20, 20));
         }
-
-        function updateGame() {
-            enemy.y += enemy.speed;
-            if (enemy.y > 400) {
-                enemy.y = 0;
-                enemy.x = Math.random() * 380;
-            }
+        
+        function gameLoop() {
+            updateSnake();
             drawGame();
         }
-
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowLeft" && player.x > 0) player.x -= 20;
-            if (event.key === "ArrowRight" && player.x < 380) player.x += 20;
-        });
-
-        setInterval(updateGame, 30);
+        setInterval(gameLoop, 100);
     </script>
 </body>
 </html>
