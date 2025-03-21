@@ -70,8 +70,9 @@
     <nav>
         <a href="#" onclick="showSection('home')">Home</a>
         <a href="#" onclick="showSection('socials')">My Socials</a>
-        <a href="#" onclick="showSection('game1')">Game 1</a>
-        <a href="#" onclick="showSection('game2')">Game 2</a>
+        <a href="#" onclick="showSection('dumb clicker')">Clicker Game</a>
+        <a href="#" onclick="showSection('background changer')">Color Game</a>
+        <a href="#" onclick="showSection('avoid the enemy')">New Game</a>
     </nav>
 
     <div id="home" class="section active">
@@ -84,14 +85,21 @@
         <button class="discord" onclick="window.location.href='https://discord.com/users/437346641880678400'">Discord</button>
     </div>
 
-    <div id="Clicker game" class="section">
-        <h2>Clicker Game</h2>
-        <p>Score: <span id="score">0</span></p>
+    <div id="dumb clicker" class="section">
+        <h2>Cookie Clicker Game</h2>
+        <p>Cookies: <span id="score">0</span></p>
         <button onclick="increaseScore()">Click Me!</button>
+        <h3>Upgrades</h3>
+        <button onclick="buyUpgrade()">Buy Auto Clicker (Cost: <span id="upgradeCost">10</span>)</button>
     </div>
 
-    <div id="Background changer" class="section">
-        <h2>Simple Game 2</h2>
+    <div id="avoid the enemy" class="section">
+        <h2>New Game: Avoid the Enemy</h2>
+        <canvas id="gameCanvas" width="400" height="400" style="background: black;"></canvas>
+    </div>
+
+    <div id="background changer" class="section">
+        <h2>Color Change Game</h2>
         <p>Press the button to change the background color!</p>
         <button onclick="changeColor()">Change Color</button>
     </div>
@@ -105,14 +113,56 @@
         }
         
         let score = 0;
+        let upgradeCost = 10;
+        let autoClickers = 0;
+        
         function increaseScore() {
             score++;
             document.getElementById("score").innerText = score;
         }
         
+        function buyUpgrade() {
+            if (score >= upgradeCost) {
+                score -= upgradeCost;
+                autoClickers++;
+                upgradeCost = Math.ceil(upgradeCost * 1.5);
+                document.getElementById("upgradeCost").innerText = upgradeCost;
+                setInterval(increaseScore, 1000);
+            }
+        }
+        
         function changeColor() {
             document.body.style.backgroundColor = '#' + Math.floor(Math.random()*16777215).toString(16);
         }
+        
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        let player = { x: 200, y: 350, size: 20 };
+        let enemy = { x: Math.random() * 380, y: 0, size: 20, speed: 2 };
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.fillRect(player.x, player.y, player.size, player.size);
+            ctx.fillStyle = "red";
+            ctx.fillRect(enemy.x, enemy.y, enemy.size, enemy.size);
+        }
+
+        function updateGame() {
+            enemy.y += enemy.speed;
+            if (enemy.y > 400) {
+                enemy.y = 0;
+                enemy.x = Math.random() * 380;
+            }
+            drawGame();
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft" && player.x > 0) player.x -= 20;
+            if (event.key === "ArrowRight" && player.x < 380) player.x += 20;
+        });
+
+        setInterval(updateGame, 30);
     </script>
 </body>
 </html>
