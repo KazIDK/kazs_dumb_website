@@ -1,11 +1,7 @@
-function showSection(sectionId) {
-    document.querySelectorAll('.section').forEach(section => {
-        section.classList.remove('active');
-    });
-    document.getElementById(sectionId).classList.add('active');
-}
-
 document.addEventListener("DOMContentLoaded", function () {
+    // Set default section (Clicker Game)
+    showSection('game1');
+
     let savedColor = localStorage.getItem("bgColor");
     if (savedColor) document.body.style.backgroundColor = savedColor;
 
