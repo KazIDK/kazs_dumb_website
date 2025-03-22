@@ -4,71 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kaz's Dumb Website</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: white;
-            text-align: center;
-            transition: background-color 0.5s;
-        }
-        nav {
-            display: flex;
-            justify-content: center;
-            background: #1f1f1f;
-            padding: 15px 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
-        }
-        nav a {
-            margin: 0 20px;
-            color: white;
-            text-decoration: none;
-            font-size: 20px;
-            transition: 0.3s;
-        }
-        nav a:hover {
-            color: cyan;
-        }
-        .section {
-            display: none;
-            padding: 100px 20px;
-            min-height: 100vh;
-        }
-        .active {
-            display: block;
-        }
-        .controls button {
-            font-size: 20px;
-            padding: 10px;
-            background: #333;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        canvas {
-            background: black;
-            display: block;
-            margin: auto;
-        }
-        @media (max-width: 600px) {
-            nav {
-                flex-wrap: wrap;
-            }
-            nav a {
-                font-size: 16px;
-                margin: 5px;
-            }
-            canvas {
-                width: 90%;
-                height: auto;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <nav>
@@ -76,19 +12,21 @@
         <a href="#" onclick="showSection('game1')">Clicker Game</a>
         <a href="#" onclick="showSection('game2')">Background Changer</a>
         <a href="#" onclick="showSection('game3')">Snake Game</a>
+        <a href="#" onclick="showSection('socials')">Socials</a>
     </nav>
 
     <div id="game1" class="section">
         <h2>Clicker Game</h2>
         <p>Cookies: <span id="score">0</span></p>
-        <button onclick="increaseScore()">Click Me!</button>
+        <button id="clickButton">Click Me!</button>
+        <div id="upgrades"></div>
         <h3>Leaderboard</h3>
         <ul id="leaderboard"></ul>
     </div>
 
     <div id="game2" class="section">
         <h2>Background Changer</h2>
-        <input type="color" id="bgColorPicker" onchange="changeColor()">
+        <input type="color" id="bgColorPicker">
     </div>
 
     <div id="game3" class="section">
@@ -96,8 +34,6 @@
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         <div class="controls">
             <button onclick="restartGame()">Restart</button>
-        </div>
-        <div class="controls">
             <button onclick="changeDirection('UP')">⬆</button>
             <button onclick="changeDirection('LEFT')">⬅</button>
             <button onclick="changeDirection('DOWN')">⬇</button>
@@ -105,82 +41,14 @@
         </div>
     </div>
 
-    <script>
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(sectionId).classList.add('active');
-        }
-        function changeColor() {
-            let color = document.getElementById("bgColorPicker").value;
-            document.body.style.backgroundColor = color;
-            localStorage.setItem("bgColor", color);
-        }
-        window.onload = function() {
-            let savedColor = localStorage.getItem("bgColor");
-            if (savedColor) document.body.style.backgroundColor = savedColor;
-        };
-        let score = 0;
-        function increaseScore() {
-            score++;
-            document.getElementById("score").innerText = score;
-            let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
-            scores.push(score);
-            scores = scores.sort((a, b) => b - a).slice(0, 5);
-            localStorage.setItem("leaderboard", JSON.stringify(scores));
-            updateLeaderboard();
-        }
-        function updateLeaderboard() {
-            let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
-            let leaderboard = document.getElementById("leaderboard");
-            leaderboard.innerHTML = scores.map(score => `<li>${score}</li>`).join('');
-        }
-        updateLeaderboard();
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        let snake = [{x: 200, y: 200}];
-        let direction = null;
-        let food = { x: Math.floor(Math.random() * 20) * 20, y: Math.floor(Math.random() * 20) * 20 };
-        let gameRunning = true;
-        document.addEventListener("keydown", (event) => {
-            if (event.key.startsWith("Arrow")) changeDirection(event.key.replace("Arrow", "").toUpperCase());
-        });
-        function changeDirection(newDirection) {
-            const opposite = { UP: "DOWN", DOWN: "UP", LEFT: "RIGHT", RIGHT: "LEFT" };
-            if (direction !== opposite[newDirection]) direction = newDirection;
-        }
-        function updateSnake() {
-            if (!gameRunning || !direction) return;
-            let head = { ...snake[0] };
-            if (direction === "UP") head.y -= 20;
-            if (direction === "DOWN") head.y += 20;
-            if (direction === "LEFT") head.x -= 20;
-            if (direction === "RIGHT") head.x += 20;
-            if (head.x === food.x && head.y === food.y) {
-                food = { x: Math.floor(Math.random() * 20) * 20, y: Math.floor(Math.random() * 20) * 20 };
-            } else {
-                snake.pop();
-            }
-            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-                gameRunning = false;
-                alert("Game Over!");
-            }
-            snake.unshift(head);
-        }
-        function drawGame() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "red";
-            ctx.fillRect(food.x, food.y, 20, 20);
-            ctx.fillStyle = "lime";
-            snake.forEach(part => ctx.fillRect(part.x, part.y, 20, 20));
-        }
-        setInterval(() => { updateSnake(); drawGame(); }, 100);
-        function restartGame() {
-            snake = [{x: 200, y: 200}];
-            direction = null;
-            gameRunning = true;
-        }
-    </script>
+    <div id="socials" class="section">
+        <h2>My Socials</h2>
+        <a id="discord-link" href="https://discord.com/users/437346641880678400">My Discord</a>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="clicker.js"></script>
+    <script src="background.js"></script>
+    <script src="snake.js"></script>
 </body>
 </html>
