@@ -11,5 +11,9 @@ nav a {
     font-weight: bold;
 }
 .section {
-    display: none; /* Hide sections by default */
+    display: none; /* Hide all sections */
+}
+
+.section.active {
+    display: block; /* Show only the active section */
 }
