@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Set default section (Clicker Game)
-    showSection('game1');
+    showSection('game1'); // Change this to the section you want visible by default
 
     let savedColor = localStorage.getItem("bgColor");
     if (savedColor) document.body.style.backgroundColor = savedColor;
