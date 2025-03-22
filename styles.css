@@ -1,19 +1,12 @@
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
+    background-color: black;
+    color: white; /* Ensures text is visible */
 }
-nav {
-    margin-bottom: 20px;
-}
-nav a {
-    margin: 0 10px;
-    text-decoration: none;
-    font-weight: bold;
-}
+
 .section {
-    display: none; /* Hide all sections */
+    display: none;
 }
 
 .section.active {
-    display: block; /* Show only the active section */
+    display: block;
 }
